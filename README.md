@@ -14,7 +14,7 @@ Deploy your own Horilla HRMS instance on Railway in seconds.
 
 ## Deploy Now
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?templateUrl=https://github.com/YOUR_USERNAME/horilla-saas-template)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?templateUrl=https://github.com/vizsoftglobal/horilla-saas-template)
 
 ## What Gets Deployed
 
