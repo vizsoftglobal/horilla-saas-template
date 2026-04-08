@@ -1,0 +1,49 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "name": "Horilla HRMS",
+  "description": "Free and Open Source HRMS - Deploy your own instance with PostgreSQL",
+  "keywords": ["hrms", "hr", "human-resources", "employee-management"],
+  "services": [
+    {
+      "name": "postgres",
+      "image": "postgres:16-bullseye",
+      "environment": {
+        "POSTGRES_DB": "horilla",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "${{ secret() }}",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256",
+        "PGDATA": "/var/lib/postgresql/data/pgdata"
+      },
+      "volumes": [
+        {
+          "name": "horilla-data",
+          "mountPath": "/var/lib/postgresql/data"
+        }
+      ],
+      "healthcheck": {
+        "test": ["CMD", "pg_isready", "-U", "postgres"],
+        "interval": 10,
+        "timeout": 5,
+        "retries": 5
+      }
+    },
+    {
+      "name": "horilla",
+      "image": "horilla/horilla:1.4",
+      "environment": {
+        "DATABASE_URL": "${{ postgres.DATABASE_URL }}",
+        "ALLOWED_HOSTS": "*",
+        "CSRF_TRUSTED_ORIGINS": "https://${{ RAILWAY_PUBLIC_DOMAIN }},https://*.up.railway.app",
+        "DB_INIT_PASSWORD": "${{ postgres.POSTGRES_PASSWORD }}"
+      },
+      "startCommand": "sh -c \"apt-get update && apt-get install -y gettext && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py compilemessages && gunicorn --bind 0.0.0.0:8000 horilla.wsgi:application\"",
+      "preDeployCommand": "python3 manage.py migrate --run-syncdb",
+      "port": 8000,
+      "domains": [
+        {
+          "name": "horilla"
+        }
+      ]
+    }
+  ]
+}
