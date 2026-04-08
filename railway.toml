@@ -1,0 +1,12 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "sh -c \"apt-get update && apt-get install -y gettext && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py compilemessages && gunicorn --bind 0.0.0.0:8000 horilla.wsgi:application\""
+preDeployCommand = "python3 manage.py migrate --run-syncdb"
+
+[env]
+DATABASE_URL = "${{ Postgres.DATABASE_URL }}"
+ALLOWED_HOSTS = "*"
+CSRF_TRUSTED_ORIGINS = "https://${{ RAILWAY_PUBLIC_DOMAIN }},https://*.up.railway.app"
+DB_INIT_PASSWORD = "${{ Postgres.POSTGRES_PASSWORD }}"
